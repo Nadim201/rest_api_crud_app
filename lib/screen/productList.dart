@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:rest_api_crud_app/apikey.dart';
 import 'package:rest_api_crud_app/model/product.dart';
 import 'package:rest_api_crud_app/screen/addProduct.dart';
@@ -46,7 +46,7 @@ class _ProductListState extends State<ProductList> {
         centerTitle: true,
       ),
       floatingActionButton: Align(
-        alignment: Alignment.bottomRight,
+        alignment: Alignment.bottomCenter,
         child: FloatingActionButton(
           backgroundColor: Colors.indigoAccent,
           shape:
@@ -134,7 +134,9 @@ class _ProductListState extends State<ProductList> {
                                   const SizedBox(height: 50),
                                   IconButton(
                                     onPressed: () {
-                                      deleteItem(item.productId);
+                                      setState(() {
+                                        deleteItem(index, item.productId);
+                                      });
                                     },
                                     icon: const Icon(
                                       Icons.delete,
@@ -155,17 +157,23 @@ class _ProductListState extends State<ProductList> {
     );
   }
 
-  Future<void> deleteItem(String id) async {
-    Uri uri = Uri.parse('http://164.68.107.70:6060/api/v1/DeleteProduct/$id');
-    Response response = await delete(uri);
+  Future<void> deleteItem(int index, String id) async {
+    final Url = 'http://164.68.107.70:6060/api/v1/DeleteProduct/$id';
+
+    final uri = Uri.parse(Url);
+    final response = await http.get(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
     if (response.statusCode == 200) {
-      final filter = items.where((element) => element.productId != id).toList();
       setState(() {
-        items = filter;
+        items.removeAt(index);
       });
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Item delete')));
+          .showSnackBar(const SnackBar(content: Text('Item delete field')));
     }
   }
 }
