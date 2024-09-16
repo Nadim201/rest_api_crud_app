@@ -29,12 +29,11 @@ class _addProductState extends State<addProduct> {
   final TextEditingController totalPriceController = TextEditingController();
   final TextEditingController createdDateController = TextEditingController();
 
-  // just testing
   @override
   void initState() {
     super.initState();
     if (widget.product != null) {
-      product = widget.product!; // Assign the product to the local variable
+      product = widget.product!;
       idController.text = product.productId;
       productNameController.text = product.productName;
       productCodeController.text = product.productCode;
@@ -68,7 +67,7 @@ class _addProductState extends State<addProduct> {
                         : _onTabAddProductButton,
                     child: Text(
                       widget.product == null ? 'Submit' : 'Update',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
           ),

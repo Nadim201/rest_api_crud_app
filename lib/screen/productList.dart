@@ -55,7 +55,7 @@ class _ProductListState extends State<ProductList> {
                 });
                 fetchApi();
               },
-              icon: Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh),
             ),
           ),
         ],
@@ -67,8 +67,12 @@ class _ProductListState extends State<ProductList> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const addProduct(product: null,)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => const addProduct(
+                          product: null,
+                        )));
           },
           child: const Icon(
             Icons.add,
@@ -85,7 +89,7 @@ class _ProductListState extends State<ProductList> {
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Card(
-                    color: Colors.white,
+                    color: Colors.grey.shade100,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 10),
                     elevation: 1,
@@ -97,80 +101,12 @@ class _ProductListState extends State<ProductList> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            height: 150,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                image: NetworkImage(item.image, scale: 1),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                          buildImageSection(item),
+                          const SizedBox(
+                            height: 5,
                           ),
                           const SizedBox(width: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Name: ${item.productName}',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text('Id: ${item.productId}'),
-                                  const SizedBox(height: 5),
-                                  Text('Code: ${item.productCode}'),
-                                  const SizedBox(height: 5),
-                                  Text('Quantity: ${item.productQuantity}'),
-                                  const SizedBox(height: 5),
-                                  Text('Price: \$${item.productPrice}'),
-                                  const SizedBox(height: 5),
-                                  Text('Total: \$${item.productTotalPrice}'),
-                                  const SizedBox(height: 5),
-                                  Text('Date: ${item.creationDate}'),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const SizedBox(height: 40),
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => addProduct(
-                                            product: item,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.indigoAccent,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 50),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        deleteItem(item.productId);
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                          buildProductDetails(item, context),
                         ],
                       ),
                     ),
@@ -178,6 +114,83 @@ class _ProductListState extends State<ProductList> {
                 },
               ),
             ),
+    );
+  }
+
+  Widget buildProductDetails(Product item, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Name: ${item.productName}',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 5),
+            Text('Id: ${item.productId}'),
+            const SizedBox(height: 5),
+            Text('Code: ${item.productCode}'),
+            const SizedBox(height: 5),
+            Text('Quantity: ${item.productQuantity}'),
+            const SizedBox(height: 5),
+            Text('Price: \$${item.productPrice}'),
+            const SizedBox(height: 5),
+            Text('Total: \$${item.productTotalPrice}'),
+            const SizedBox(height: 5),
+            Text('Date: ${item.creationDate}'),
+          ],
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            const SizedBox(height: 40),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => addProduct(
+                      product: item,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.indigoAccent,
+              ),
+            ),
+            const SizedBox(height: 50),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  deleteItem(item.productId);
+                });
+              },
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildImageSection(Product item) {
+    return Container(
+      height: 150,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        image: DecorationImage(
+          image: NetworkImage(item.image, scale: 1),
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 
