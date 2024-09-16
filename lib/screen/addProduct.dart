@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:rest_api_crud_app/model/product.dart';
 
 import '../widget.dart';
 
 class addProduct extends StatefulWidget {
-  const addProduct({super.key});
+  const addProduct({super.key, required this.product});
+
+  final Product? product;
 
   @override
   State<addProduct> createState() => _addProductState();
@@ -14,6 +18,7 @@ class addProduct extends StatefulWidget {
 class _addProductState extends State<addProduct> {
   bool inProgress = false;
   final _key = GlobalKey<FormState>();
+  late final Product product;
 
   final TextEditingController idController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
@@ -24,47 +29,21 @@ class _addProductState extends State<addProduct> {
   final TextEditingController totalPriceController = TextEditingController();
   final TextEditingController createdDateController = TextEditingController();
 
+  // just testing
   @override
-  void dispose() {
-    idController.dispose();
-    productNameController.dispose();
-    productCodeController.dispose();
-    imgController.dispose();
-    unitPriceController.dispose();
-    qtyController.dispose();
-    totalPriceController.dispose();
-    createdDateController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Product',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildForm(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _clearTextFields() {
-    imgController.clear();
-    productCodeController.clear();
-    productNameController.clear();
-    qtyController.clear();
-    totalPriceController.clear();
-    unitPriceController.clear();
-    createdDateController.clear();
+  void initState() {
+    super.initState();
+    if (widget.product != null) {
+      product = widget.product!; // Assign the product to the local variable
+      idController.text = product.productId;
+      productNameController.text = product.productName;
+      productCodeController.text = product.productCode;
+      imgController.text = product.image;
+      unitPriceController.text = product.productPrice.toString();
+      qtyController.text = product.productQuantity.toString();
+      totalPriceController.text = product.productTotalPrice.toString();
+      createdDateController.text = product.creationDate;
+    }
   }
 
   Form buildForm() {
@@ -84,9 +63,11 @@ class _addProductState extends State<addProduct> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: _onTabAddProductButton,
-                    child: const Text(
-                      'Submit',
+                    onPressed: widget.product != null
+                        ? _onTabUpdateProductButton
+                        : _onTabAddProductButton,
+                    child: Text(
+                      widget.product == null ? 'Submit' : 'Update',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -100,6 +81,49 @@ class _addProductState extends State<addProduct> {
     if (_key.currentState!.validate()) {
       addProductFetch();
     }
+  }
+
+  void _onTabUpdateProductButton() {
+    if (_key.currentState!.validate()) {
+      updateProductFetch(product.productId);
+    }
+  }
+
+  Future<void> updateProductFetch(String id) async {
+    setState(() {
+      inProgress = true;
+    });
+    Uri uri = Uri.parse('http://164.68.107.70:6060/api/v1/UpdateProduct/$id');
+    Map<String, dynamic> data = {
+      "Img": imgController.text,
+      "ProductCode": productCodeController.text,
+      "ProductName": productNameController.text,
+      "Qty": qtyController.text,
+      "TotalPrice": totalPriceController.text,
+      "UnitPrice": unitPriceController.text
+    };
+
+    Response response = await http.post(
+      uri,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      _clearTextFields();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Product Update successfully'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Product Update failed')));
+    }
+    setState(() {
+      inProgress = false;
+    });
   }
 
   Future<void> addProductFetch() async {
@@ -126,7 +150,7 @@ class _addProductState extends State<addProduct> {
     if (response.statusCode == 200) {
       _clearTextFields();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Product add successfully'),
         ),
       );
@@ -156,7 +180,7 @@ class _addProductState extends State<addProduct> {
           height: 16,
         ),
         TextFormFild(
-          hintText: 'Product Image',
+          hintText: 'Image Url',
           label: 'Image',
           controller: imgController,
         ),
@@ -205,5 +229,48 @@ class _addProductState extends State<addProduct> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    idController.dispose();
+    productNameController.dispose();
+    productCodeController.dispose();
+    imgController.dispose();
+    unitPriceController.dispose();
+    qtyController.dispose();
+    totalPriceController.dispose();
+    createdDateController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.product == null ? 'Add Product' : 'Edit Product',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildForm(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _clearTextFields() {
+    imgController.clear();
+    productCodeController.clear();
+    productNameController.clear();
+    qtyController.clear();
+    totalPriceController.clear();
+    unitPriceController.clear();
+    createdDateController.clear();
   }
 }

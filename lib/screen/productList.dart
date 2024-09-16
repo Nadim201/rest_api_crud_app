@@ -14,6 +14,7 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   List<Product> items = [];
   bool isLoading = true;
+  bool isEdit = true;
 
   @override
   void initState() {
@@ -44,6 +45,20 @@ class _ProductListState extends State<ProductList> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              onPressed: () {
+                setState(() {
+                  isLoading = true;
+                });
+                fetchApi();
+              },
+              icon: Icon(Icons.refresh),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
@@ -53,7 +68,7 @@ class _ProductListState extends State<ProductList> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           onPressed: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const addProduct()));
+                MaterialPageRoute(builder: (builder) => const addProduct(product: null,)));
           },
           child: const Icon(
             Icons.add,
@@ -125,7 +140,16 @@ class _ProductListState extends State<ProductList> {
                                 children: [
                                   const SizedBox(height: 40),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => addProduct(
+                                            product: item,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                     icon: const Icon(
                                       Icons.edit,
                                       color: Colors.indigoAccent,
@@ -135,7 +159,7 @@ class _ProductListState extends State<ProductList> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        deleteItem(index, item.productId);
+                                        deleteItem(item.productId);
                                       });
                                     },
                                     icon: const Icon(
@@ -157,10 +181,10 @@ class _ProductListState extends State<ProductList> {
     );
   }
 
-  Future<void> deleteItem(int index, String id) async {
-    final Url = 'http://164.68.107.70:6060/api/v1/DeleteProduct/$id';
+  Future<void> deleteItem(String id) async {
+    final url = 'http://164.68.107.70:6060/api/v1/DeleteProduct/$id';
 
-    final uri = Uri.parse(Url);
+    final uri = Uri.parse(url);
     final response = await http.get(
       uri,
       headers: <String, String>{
@@ -169,11 +193,16 @@ class _ProductListState extends State<ProductList> {
     );
     if (response.statusCode == 200) {
       setState(() {
-        items.removeAt(index);
+        fetchApi();
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Item deletion complete')));
       });
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Item delete field')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Item delete field'),
+        ),
+      );
     }
   }
 }

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:rest_api_crud_app/model/product.dart';
 
 Future<void> getProductList(List<Product> items) async {
-  final url = 'http://164.68.107.70:6060/api/v1/ReadProduct';
+  const url = 'http://164.68.107.70:6060/api/v1/ReadProduct';
   final uri = Uri.parse(url);
   final response = await http.get(uri);
   print(response.body);
