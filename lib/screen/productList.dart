@@ -68,11 +68,13 @@ class _ProductListState extends State<ProductList> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (builder) => const addProduct(
-                          product: null,
-                        )));
+              context,
+              MaterialPageRoute(
+                builder: (builder) => const addProduct(
+                  product: null,
+                ),
+              ),
+            );
           },
           child: const Icon(
             Icons.add,
@@ -81,7 +83,9 @@ class _ProductListState extends State<ProductList> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : RefreshIndicator(
               onRefresh: _refresh,
               child: ListView.builder(

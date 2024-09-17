@@ -159,6 +159,49 @@ class _addProductState extends State<addProduct> {
     });
   }
 
+  void _clearTextFields() {
+    imgController.clear();
+    productCodeController.clear();
+    productNameController.clear();
+    qtyController.clear();
+    totalPriceController.clear();
+    unitPriceController.clear();
+    createdDateController.clear();
+  }
+
+  @override
+  void dispose() {
+    idController.dispose();
+    productNameController.dispose();
+    productCodeController.dispose();
+    imgController.dispose();
+    unitPriceController.dispose();
+    qtyController.dispose();
+    totalPriceController.dispose();
+    createdDateController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.product == null ? 'Add Product' : 'Edit Product',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildForm(),
+          ),
+        ),
+      ),
+    );
+  }
+
   Column buildTextFormField() {
     return Column(
       children: [
@@ -228,48 +271,5 @@ class _addProductState extends State<addProduct> {
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    idController.dispose();
-    productNameController.dispose();
-    productCodeController.dispose();
-    imgController.dispose();
-    unitPriceController.dispose();
-    qtyController.dispose();
-    totalPriceController.dispose();
-    createdDateController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.product == null ? 'Add Product' : 'Edit Product',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildForm(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _clearTextFields() {
-    imgController.clear();
-    productCodeController.clear();
-    productNameController.clear();
-    qtyController.clear();
-    totalPriceController.clear();
-    unitPriceController.clear();
-    createdDateController.clear();
   }
 }
